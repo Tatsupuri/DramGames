@@ -11,15 +11,7 @@ namespace Klak.Timeline.Midi
 
         public static MidiFileAsset Load(byte [] data)
         {
-            var reader = new MidiDataStreamReader(data);
-
-            //Debug.Log("Deserializer is called");
-            //Debug.Log(reader.ReadChars(4));
-            //Debug.Log(reader.ReadBEUInt32());
-            //Debug.Log(reader.ReadBEUInt16());
-            //Debug.Log();
-            //Debug.Log();
-            //Debug.Log();
+            var reader = new MidiDataStreamReader(data);;
 
             // Chunk type
             if (reader.ReadChars(4) != "MThd")
@@ -79,11 +71,36 @@ namespace Klak.Timeline.Midi
                 if ((reader.PeekByte() & 0x80u) != 0)
                     stat = reader.ReadByte();
                 
-                if (stat == 0xffu)
+                if (stat == 0xffu)//255,FFのこと
                 {
-                    // 0xff: Meta event (unused)
-                    reader.Advance(1);
-                    reader.Advance(reader.ReadMultiByteValue());
+                    // 0xff: Meta event (unused) メタイベントにテンポ情報とか入っている
+
+                    //reader.Advance(1);//オリジナルのスクリプト：メタデータの種類
+                    var meta = reader.ReadByte();
+
+                    if (meta == 0x51u)
+                    {
+                        var dataLengh = reader.ReadMultiByteValue();//データ長の情報。ここでは03が入るはず。（テンポの情報は３バイトであらわされる）
+                        var data = reader.ReadBEUInt24();//テンポのデータ。単位は[ms/qn]。通常表記のテンポ[qn/min]に直すには、逆数に60000000をかければ良い。
+
+                        var tmp = Math.Round(60000000 / (float)data);
+                        //出力するとき、MidiEventのインスタンスで返すが、小数の情報が落ちてしまうのでRoundにしておく。複雑なテンポはないと仮定する。
+
+                        events.Add(new MidiEvent
+                        {
+                            time = ticks,
+                            status = stat,
+                            data1 = meta,
+                            data2 = (byte)tmp
+                        });
+
+                        Debug.Log(ticks +":: Tempo info:" + stat +", " + meta + ", " + dataLengh + ", " + tmp);
+                    }
+                    else
+                    {
+                        reader.Advance(reader.ReadMultiByteValue());//reader.ReadMultiByteValue()で続くデータ長さを取得。その分Advanceで送っている。
+                    }
+
                 }
                 else if (stat == 0xf0u)
                 {

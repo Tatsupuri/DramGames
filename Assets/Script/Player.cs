@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField] int initialLife = 10;
+    
     private int life;
     private int score;
 
@@ -14,14 +15,24 @@ public class Player : MonoBehaviour
         life = initialLife;
     }
 
-    private void AddScore(int point)
+    public void AddScore(int point)
     {
         score += point;
     }
 
-    private void Damage(int damage) 
+    public void Damage(int damage) 
     {
         life -= damage;
+    }
+
+    public int Life() 
+    {
+        return life;
+    }
+
+    public int Score()
+    {
+        return score;
     }
 
 }
