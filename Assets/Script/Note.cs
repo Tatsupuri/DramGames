@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.VFX;
+using UnityEngine.VFX;
 
 public class Note : MonoBehaviour
 {
@@ -15,14 +17,20 @@ public class Note : MonoBehaviour
     [SerializeField] Material defaultMat;
     [SerializeField] Material touchedMat;
 
+    private Transform VFXs;
+    private VisualEffect VFX;
+
+
+
     private GameObject player;
 
     // Start is called before the first frame update
     void Start()
     {
         this.gameObject.GetComponent<MeshRenderer>().material = defaultMat;
-        Debug.Log(lineNumber);
         player = GameObject.FindGameObjectWithTag("Player");
+        VFXs = GameObject.FindGameObjectWithTag("VFX").transform;
+        VFX = VFXs.GetChild(lineNumber - 1).GetComponent<VisualEffect>();
     }
 
     // Update is called once per frame
@@ -60,8 +68,9 @@ public class Note : MonoBehaviour
             //if(Judge(lineNumber))//バーに触れているとき、入力があったかをJudgeして、あれば破壊して得点を与える。
             if(lineNumber == 3)
             {
+                VFX.SendEvent("OnPlay");
+                player.GetComponent<Player>().AddScore(1);
                 Destroy(this.gameObject);
-                player.GetComponent<Player>().AddScore(1);             
             }
 
         }
