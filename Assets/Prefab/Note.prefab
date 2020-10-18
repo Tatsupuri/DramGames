@@ -107,9 +107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f882c4f0a566c7c4fba09d8926c4a929, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.03
+  initial: 0
+  speed: 0.05
   deadPoint: -1
-  mag: 1.005
+  mag: 1.05
   defaultMat: {fileID: 2100000, guid: 4ed16e230c1593e49a72e7d1fb69cd58, type: 2}
   touchedMat: {fileID: 2100000, guid: fd33e5cf850f486458a00ba47f74a646, type: 2}
 --- !u!54 &4190307626819096578

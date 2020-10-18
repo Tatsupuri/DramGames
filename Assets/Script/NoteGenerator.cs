@@ -8,6 +8,7 @@ using Klak.Timeline.Midi;
 public class NoteGenerator : MonoBehaviour
 {
     [SerializeField] string file;//Pathの直打ち
+    public bool toConsole;
 
     private MidiEvent[] midiEventSet;
     public GameObject notePrefab;
@@ -24,17 +25,21 @@ public class NoteGenerator : MonoBehaviour
     private float qndt; //Quater note delta time
     private float ratio;
     private float time;
+    private float runTimeTick;
     [SerializeField] private float timeOffset = 3;
 
     public bool audio;
-  
+
+    [SerializeField] private List<int> midiEventData;
+
+    
 
     void Start()
     {
         MidiSet();
-        qndt = 60f / tempo;
-        ratio = tpqn / qndt; //Second to Ticks
+        AudioSpeed();
         time = -timeOffset;
+        runTimeTick = -timeOffset * ratio;
 
         audio = false;
     }
@@ -42,27 +47,39 @@ public class NoteGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        time += Time.deltaTime;
+        //time += Time.deltaTime;
+        runTimeTick += Time.deltaTime * ratio;
 
         if (index < numOfData)//Indexがデータの総量を超えてたら何もしない
         {
-            //Debug.Log(midiEventSet[i].time + "," + midiEventSet[i].status + "," + midiEventSet[i].data1 + "," + midiEventSet[i].data2);
-            //Debug.Log(time * ratio);
 
-            while (time * ratio >= midiEventSet[index].time && index < numOfData) //以下の処理で同時刻のノートをすべて発生させる
+            while (runTimeTick >= midiEventSet[index].time && index < numOfData) //以下の処理で同時刻のノートをすべて発生させる
             {
-                //Debug.Log(time * ratio >= midiEventSet[index].time);
-                if (midiEventSet[index].data2 == 80 || midiEventSet[index].data2 == 90 || midiEventSet[index].data2 == 94 ) //発音情報かどうか？
+                if (index == 0)
                 {
-                    NoteSet((float)midiEventSet[index].time / 200f, midiEventSet[index].data1);
+                    Init();
                 }
+
+                    if (midiEventSet[index].status == 255 && midiEventSet[index].data1 == 81)//テンポ情報かどうかの判定 
+                    {
+                        tempo = midiEventSet[index].data2;
+                        //AudioSpeed();
+                    }
+                    else if (midiEventSet[index].status == 153) //発音情報かどうか？
+                    // && midiEventData.Contains(midiEventSet[index].data2)
+                    //(midiEventSet[index].data2 == 64 || midiEventSet[index].data2 == 80 || midiEventSet[index].data2 == 90 || midiEventSet[index].data2 == 94 || midiEventSet[index].data2 == 100 || midiEventSet[index].data2 == 106 || midiEventSet[index].data2 == 110 || midiEventSet[index].data2 == 112 || midiEventSet[index].data2 == 114 || midiEventSet[index].data2 == 127)
+                {
+                    NoteSet(midiEventSet[index].data1);
+                    }
 
                 index += 1;
             }
+
+            AudioSpeed();
         }
         else
         {
-            if (time > duration / ratio + timeOffset) 
+            if (runTimeTick > duration + timeOffset * ratio)
             {
                 Debug.Log("END");
                 Application.Quit();
@@ -70,7 +87,7 @@ public class NoteGenerator : MonoBehaviour
         }
     }
 
-    void MidiSet() 
+    void MidiSet()
     {
         var buffer = File.ReadAllBytes(file);
         var asset = MidiFileDeserializer.Load(buffer);
@@ -96,9 +113,12 @@ public class NoteGenerator : MonoBehaviour
 
             midiEventSet = track.template.events;
 
-            foreach (MidiEvent midiEvent in midiEventSet)
+            if (toConsole)
             {
-               //Debug.Log(midiEvent.time+","+ midiEvent.status + ","+ midiEvent.data1 + ","+ midiEvent.data2);
+                foreach (MidiEvent midiEvent in midiEventSet)
+                {
+                    Debug.Log(midiEvent.time + "," + midiEvent.status + "," + midiEvent.data1 + "," + (uint)midiEvent.data2);
+                }
             }
         }
         else
@@ -107,28 +127,46 @@ public class NoteGenerator : MonoBehaviour
         }
     }
 
-    void NoteSet(float time,int tone) 
+    void AudioSpeed()
+    {
+        qndt = 60f / tempo;
+        ratio = tpqn / qndt; //Second to Ticks
+    }
+
+    void NoteSet(int tone)
     {
         if (tone == 51 || tone == 59 || tone == 47)//ride, low mid
         {
-            Instantiate(notePrefab, new Vector3(3.0f, 0, startPoint), Quaternion.identity);
+            GameObject note = Instantiate(notePrefab, new Vector3(3.0f, 0, startPoint), Quaternion.identity);
+            note.GetComponent<Note>().lineNumber = 5;
         }
         else if (tone == 35 || tone == 36 || tone == 43)//bass, high floor
         {
-            Instantiate(notePrefab, new Vector3(1.5f, 0, startPoint), Quaternion.identity);
+            GameObject note = Instantiate(notePrefab, new Vector3(1.5f, 0, startPoint), Quaternion.identity);
+            note.GetComponent<Note>().lineNumber = 4;
         }
         else if (tone == 38 || tone == 40)//snare
         {
-            Instantiate(notePrefab, new Vector3(0, 0, startPoint), Quaternion.identity);
+            GameObject note = Instantiate(notePrefab, new Vector3(0, 0, startPoint), Quaternion.identity);
+            note.GetComponent<Note>().lineNumber = 3;
         }
         else if (tone == 42) //closed high hat
         {
-            Instantiate(notePrefab, new Vector3(-1.5f, 0, startPoint), Quaternion.identity);
+            GameObject note = Instantiate(notePrefab, new Vector3(-1.5f, 0, startPoint), Quaternion.identity);
+            note.GetComponent<Note>().lineNumber = 2;
         }
         else if (tone == 49 || tone == 57 || tone == 46 || tone == 44) //crash, open high hat, pedal high hat
         {
-            Instantiate(notePrefab, new Vector3(-3.0f, 0, startPoint), Quaternion.identity);
+            GameObject note = Instantiate(notePrefab, new Vector3(-3.0f, 0, startPoint), Quaternion.identity);
+            note.GetComponent<Note>().lineNumber = 1;
         }
 
+    }
+
+    void Init() 
+    {
+        GameObject init = Instantiate(notePrefab, new Vector3(0, 0, startPoint), Quaternion.identity);
+        init.GetComponent<Note>().initial = true;
+        init.GetComponent<MeshRenderer>().enabled = false;
     }
 }

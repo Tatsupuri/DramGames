@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Note : MonoBehaviour
 {
+    public bool initial = false;
+    public int lineNumber;
+
     [SerializeField] float speed = 0.05f;
     [SerializeField] float deadPoint = 0;
 
@@ -12,12 +15,11 @@ public class Note : MonoBehaviour
     [SerializeField] Material defaultMat;
     [SerializeField] Material touchedMat;
 
-
-
     // Start is called before the first frame update
     void Start()
     {
         this.gameObject.GetComponent<MeshRenderer>().material = defaultMat;
+        Debug.Log(lineNumber);
     }
 
     // Update is called once per frame
@@ -25,7 +27,7 @@ public class Note : MonoBehaviour
     {
         this.transform.Translate(0, 0, -speed);
 
-        if (this.transform.position.z < 0 && !GameObject.FindGameObjectWithTag("GameController").GetComponent<NoteGenerator>().audio)
+        if (initial && this.transform.position.z < 0 && !GameObject.FindGameObjectWithTag("GameController").GetComponent<NoteGenerator>().audio)
         {//ノートがバーについたときまだ音楽が始まっていなかったら、つまり最初のノートの時音楽を開始する
 
             GameObject.FindGameObjectWithTag("GameController").GetComponent<AudioSource>().Play();
@@ -33,7 +35,7 @@ public class Note : MonoBehaviour
         }
             
 
-        if (this.transform.position.z < deadPoint) 
+        if (this.transform.position.z < deadPoint)//プレハブを破壊
         {
             Destroy(this.gameObject);
 
@@ -49,12 +51,31 @@ public class Note : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Bar") 
+        {
+            //if(Judge(gameObject.lineNumber))//バーに触れているとき、入力があったかをJudgeして、あれば破壊して得点を与える。
+            //{
+            //  Destroy(this.gameObject);
+            //  
+            //}
+
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag == "Bar")
         {
             this.gameObject.GetComponent<MeshRenderer>().material = defaultMat;
             transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            //この段階でまだ破壊されていない時はミス。プレイヤーにダメージ。
         }
+    }
+    
+    private void Dead() //このObjectがバーに触れているときにこのメソッドが呼ばれると得点。
+    {
+        
     }
 }
