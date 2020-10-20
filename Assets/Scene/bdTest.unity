@@ -2442,7 +2442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   file: test.mid
-  toConsole: 0
+  toConsole: 1
   notePrefab: {fileID: 9096843933991131950, guid: 6309a278758b033429c80293daee5188,
     type: 3}
   tempo: 92
