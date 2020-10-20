@@ -124,7 +124,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initial: 0
-  speed: 0.04
+  lineNumber: 0
+  speed: 0.4
   deadPoint: -1
   mag: 50
   defaultMat: {fileID: 2100000, guid: 59744544f878fa0448a97243b220248c, type: 2}

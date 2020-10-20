@@ -8,6 +8,8 @@ using Klak.Timeline.Midi;
 public class NoteGenerator : MonoBehaviour
 {
     [SerializeField] string file;//Pathの直打ち
+    string fullPath;
+
     public bool toConsole;
 
     private MidiEvent[] midiEventSet;
@@ -36,6 +38,8 @@ public class NoteGenerator : MonoBehaviour
 
     void Start()
     {
+        fullPath = Application.streamingAssetsPath + "/MIDI/" + file;
+
         MidiSet();
         AudioSpeed();
         time = -timeOffset;
@@ -49,6 +53,7 @@ public class NoteGenerator : MonoBehaviour
     {
         //time += Time.deltaTime;
         runTimeTick += Time.deltaTime * ratio;
+        //Debug.Log(runTimeTick);
 
         if (index < numOfData)//Indexがデータの総量を超えてたら何もしない
         {
@@ -65,11 +70,11 @@ public class NoteGenerator : MonoBehaviour
                         tempo = midiEventSet[index].data2;
                         //AudioSpeed();
                     }
-                    else if (midiEventSet[index].status == 153) //発音情報かどうか？
+                    else if (midiEventSet[index].status == 153 && midiEventSet[index].data2 != 0) //発音情報かどうか？
                     // && midiEventData.Contains(midiEventSet[index].data2)
                     //(midiEventSet[index].data2 == 64 || midiEventSet[index].data2 == 80 || midiEventSet[index].data2 == 90 || midiEventSet[index].data2 == 94 || midiEventSet[index].data2 == 100 || midiEventSet[index].data2 == 106 || midiEventSet[index].data2 == 110 || midiEventSet[index].data2 == 112 || midiEventSet[index].data2 == 114 || midiEventSet[index].data2 == 127)
-                {
-                    NoteSet(midiEventSet[index].data1);
+                    {
+                        NoteSet(midiEventSet[index].data1);
                     }
 
                 index += 1;
@@ -89,7 +94,7 @@ public class NoteGenerator : MonoBehaviour
 
     void MidiSet()
     {
-        var buffer = File.ReadAllBytes(file);
+        var buffer = File.ReadAllBytes(fullPath);
         var asset = MidiFileDeserializer.Load(buffer);
 
 
@@ -139,26 +144,31 @@ public class NoteGenerator : MonoBehaviour
         {
             GameObject note = Instantiate(notePrefab, new Vector3(3.0f, 0, startPoint), Quaternion.identity);
             note.GetComponent<Note>().lineNumber = 5;
+            Debug.Log(runTimeTick+":"+note.GetComponent<Note>().lineNumber);
         }
         else if (tone == 35 || tone == 36 || tone == 43)//bass, high floor
         {
             GameObject note = Instantiate(notePrefab, new Vector3(1.5f, 0, startPoint), Quaternion.identity);
             note.GetComponent<Note>().lineNumber = 4;
+            Debug.Log(runTimeTick+":"+note.GetComponent<Note>().lineNumber);
         }
         else if (tone == 38 || tone == 40)//snare
         {
             GameObject note = Instantiate(notePrefab, new Vector3(0, 0, startPoint), Quaternion.identity);
             note.GetComponent<Note>().lineNumber = 3;
+            Debug.Log(runTimeTick+":"+note.GetComponent<Note>().lineNumber);
         }
         else if (tone == 42) //closed high hat
         {
             GameObject note = Instantiate(notePrefab, new Vector3(-1.5f, 0, startPoint), Quaternion.identity);
             note.GetComponent<Note>().lineNumber = 2;
+            Debug.Log(runTimeTick+":"+note.GetComponent<Note>().lineNumber);
         }
         else if (tone == 49 || tone == 57 || tone == 46 || tone == 44) //crash, open high hat, pedal high hat
         {
             GameObject note = Instantiate(notePrefab, new Vector3(-3.0f, 0, startPoint), Quaternion.identity);
             note.GetComponent<Note>().lineNumber = 1;
+            Debug.Log(runTimeTick+":"+note.GetComponent<Note>().lineNumber);
         }
 
     }

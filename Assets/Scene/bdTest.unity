@@ -2441,7 +2441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1180eb3d9e40cab45989af53311a4fb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  file: Assets/MIDI/Burn.mid
+  file: test.mid
   toConsole: 0
   notePrefab: {fileID: 9096843933991131950, guid: 6309a278758b033429c80293daee5188,
     type: 3}
@@ -2474,7 +2474,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 3fbf127a46b6d6145ae85a192866698a, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 6e16b46b0bec0e74c86b73539eafd2fc, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
