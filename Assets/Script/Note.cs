@@ -52,43 +52,75 @@ public class Note : MonoBehaviour
         }
     }
 
+    public void Success()
+    {
+        VFX.SendEvent("OnPlay");
+        //player.GetComponent<Player>().AddScore(1);
+        Destroy(this.gameObject);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
          if (other.gameObject.tag == "Bar")
         {
+            this.gameObject.tag = "now";
             this.gameObject.GetComponent<MeshRenderer>().material = touchedMat;
             transform.localScale = new Vector3(mag, mag, mag);
         }
     }
 
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.tag == "Bar") 
-        {
-            //if(Judge(lineNumber))//バーに触れているとき、入力があったかをJudgeして、あれば破壊して得点を与える。
-            if(lineNumber == 3)
-            {
-                VFX.SendEvent("OnPlay");
-                player.GetComponent<Player>().AddScore(1);
-                Destroy(this.gameObject);
-            }
+    // private void OnTriggerStay(Collider other)
+    // {
+    //     if (other.gameObject.tag == "Bar") 
+    //     {
+    //         //if(Judge(lineNumber))//バーに触れているとき、入力があったかをJudgeして、あれば破壊して得点を与える。
+    //         if(ToneToLine() == lineNumber)
+    //         {
+    //             VFX.SendEvent("OnPlay");
+    //             player.GetComponent<Player>().AddScore(1);
+    //             Destroy(this.gameObject);
+    //         }
 
-        }
-    }
+    //     }
+    // }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Bar")
+        if (other.gameObject.tag == "Bar" && !initial)
         {
+            this.gameObject.tag = "note";
             this.gameObject.GetComponent<MeshRenderer>().material = defaultMat;
             transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
             //この段階でまだ破壊されていない時はミス。プレイヤーにダメージ。
             player.GetComponent<Player>().Damage(1);
         }
     }
-    
-    private void Dead() //このObjectがバーに触れているときにこのメソッドが呼ばれると得点。
+
+    private void OnDestroy()
     {
-        
+        if(this.gameObject.tag == "now")
+        {
+            player.GetComponent<Player>().AddScore(1);
+        }
     }
+    // private int ToneToLine()
+    // {
+    //     var tone = Midi.instance.tone;
+
+    //     if(tone == 36)//バスドラム
+    //     {
+    //         return 4;
+    //     }
+    //     else if(tone == 38)//スネア
+    //     {
+    //         return 3;
+    //     }
+    //     else if(tone == 42)//クローズドハイハット
+    //     {
+    //         return 2;
+    //     }
+
+    //     return 0;
+    // }
+
 }

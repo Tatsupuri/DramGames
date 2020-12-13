@@ -8,44 +8,72 @@ using UnityEngine.SceneManagement;
 
 public class Midi : MonoBehaviour
 {
-    public static Midi instance;
+    //public static Midi instance;//シングルトン
+
+    // [DllImport("__Internal")]
+    // private static extern int FindMIDI();
+
+    // [DllImport("__Internal")]
+    // private static extern bool MIDIConnection();
+
+    // [DllImport("__Internal")]
+    // private static extern uint GetTone();
+
+    // [DllImport("__Internal")]
+    // private static extern uint GetTime();
 
     [DllImport("__Internal")]
-    private static extern int FindMIDI();
+    private static extern bool GetMIDI();
 
-    [SerializeField] Text text;
+    [SerializeField] Text numLog;
+    [SerializeField] Text connectionLog;
 
-    void Awake()
-    {
+    private int num = 0;
+    private bool isConnection = false;
 
-		if (instance != null) 
-        {
-			Destroy(this.gameObject);
-		}
-         else if (instance == null)
-        {
-			instance = this;
-		}
+    public uint tone;
+    public uint time;
 
-		DontDestroyOnLoad (this.gameObject);
-    }
+    // void Awake()
+    // {
 
-    
-    void Start()
-    {
-        
-    }
+	// 	if (instance != null) 
+    //     {
+	// 		Destroy(this.gameObject);
+	// 	}
+    //      else if (instance == null)
+    //     {
+	// 		instance = this;
+	// 	}
 
+	// 	DontDestroyOnLoad (this.gameObject);
+    // }
     
     void Update()
     {
-        int num = FindMIDI();
-        text.text = "Detected MIDI Source:" + num.ToString();
+        MIDISet();
+        //numLog.text = "Detected MIDI Source : " + num.ToString();
+        numLog.text = "Title : ";
+        connectionLog.text = "Connection : " + isConnection.ToString();
 
-        if(num == 1 && SceneManager.GetActiveScene().name　== "Setup")
+        //tone = GetTone();
+        //time = GetTime();
+    }
+
+    public void NewGame()
+    {
+        //if(num == 1 && isConnection)
+        if(isConnection)
         {
             SceneManager.LoadScene ("bdTest");
         }
         
+    }
+
+    private void MIDISet()
+    {
+        //num = FindMIDI();
+        //isConnection = MIDIConnection();
+        isConnection = GetMIDI();
     }
 }

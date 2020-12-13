@@ -93,7 +93,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.02, y: 0.02, z: 0.08}
+  m_Size: {x: 0.019994965, y: 0.019994965, z: 0.019994965}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-6387583402355454002
 Rigidbody:
@@ -126,7 +126,7 @@ MonoBehaviour:
   initial: 0
   lineNumber: 0
   speed: 0.4
-  deadPoint: -3
+  deadPoint: -1
   mag: 50
   defaultMat: {fileID: 2100000, guid: 59744544f878fa0448a97243b220248c, type: 2}
   touchedMat: {fileID: 2100000, guid: fd33e5cf850f486458a00ba47f74a646, type: 2}
